@@ -1,0 +1,12 @@
+{
+  "name": "cepfms",
+  "private": true,
+  "description": "Builds the citizen portal's Tailwind CSS (public/frontend/css/tailwind.css). Admin pages still use the Tailwind CDN.",
+  "scripts": {
+    "build:css": "tailwindcss -i public/frontend/css/tailwind.input.css -o public/frontend/css/tailwind.css --minify",
+    "watch:css": "tailwindcss -i public/frontend/css/tailwind.input.css -o public/frontend/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

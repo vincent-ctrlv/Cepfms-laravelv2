@@ -1,0 +1,117 @@
+/* CEPFMS — supplemental styles beyond Tailwind CDN utilities.
+   Color values are aligned with the Legislative Services design tokens
+   defined in styles.css (var(--ls-primary), var(--ls-emerald), etc). */
+
+body { font-family: 'Inter', system-ui, sans-serif; }
+.font-mono, .ref-number { font-family: 'Roboto Mono', monospace; font-variant-numeric: normal; }
+.kpi-value { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-variant-numeric: normal; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ls-slate, #475569); }
+
+/* Status / priority badges */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+  line-height: 1.6; white-space: nowrap;
+}
+.badge-slate { background: #f1f5f9; color: var(--ls-slate, #475569); }
+.badge-blue  { background: #dbeafe; color: #2563eb; }
+.badge-amber { background: #fef3c7; color: var(--ls-amber, #d97706); }
+.badge-teal  { background: rgba(5,150,105,0.12); color: var(--ls-emerald, #059669); }
+.badge-green { background: rgba(5,150,105,0.12); color: var(--ls-emerald, #059669); }
+.badge-red   { background: #fee2e2; color: var(--ls-red, #dc2626); }
+
+/* Cards */
+.card { background: #FFFFFF; border: 1px solid #e2e8f0; border-radius: 6px; }
+
+/* Modal */
+.modal-backdrop { background: rgba(15,23,42,0.55); }
+
+/* Toast */
+.toast {
+  min-width: 260px; max-width: 360px; padding: 12px 14px; border-radius: 6px;
+  color: #fff; font-size: 13px; font-weight: 500; box-shadow: 0 8px 24px rgba(15,23,42,0.25);
+  display: flex; align-items: flex-start; gap: 8px;
+  animation: toast-in .18s ease-out;
+}
+.toast-success { background: var(--ls-emerald, #059669); }
+.toast-error { background: var(--ls-red, #dc2626); }
+.toast-warning { background: var(--ls-amber, #d97706); }
+.toast-info { background: var(--ls-primary-dark, #0f1e3d); }
+@keyframes toast-in { from { opacity: 0; transform: translateY(-6px);} to { opacity: 1; transform: translateY(0);} }
+
+/* Drag-drop upload zone */
+.dropzone {
+  border: 2px dashed #e2e8f0; border-radius: 6px; transition: all .15s ease;
+}
+.dropzone.border-red-400 { border-color: #f87171; }
+.dropzone.dragover { border-color: var(--ls-primary, #2563eb); background: rgba(37,99,235,0.08); }
+
+/* OTP input boxes */
+.otp-box {
+  width: 44px; height: 52px; text-align: center; font-size: 20px; font-family: 'Roboto Mono', monospace;
+  border: 1px solid #e2e8f0; border-radius: 6px;
+}
+.otp-box:focus { outline: none; border-color: var(--ls-primary, #2563eb); box-shadow: 0 0 0 3px rgba(37,99,235,0.18); }
+
+/* Progress tracker (citizen tracking page) */
+.tracker-step { position: relative; }
+.tracker-line { position: absolute; top: 14px; left: 50%; width: 100%; height: 2px; background: #e2e8f0; z-index: 0; }
+.tracker-line.active { background: var(--ls-emerald, #059669); }
+.tracker-dot { width: 28px; height: 28px; border-radius: 999px; display:flex; align-items:center; justify-content:center; position: relative; z-index: 1; }
+
+/* Admin sidebar: fixed off-canvas drawer on mobile, permanently pinned to
+   the viewport on desktop (not just "sticky", which only sticks within its
+   parent's own height — since the parent here grows with page content, a
+   merely-sticky h-screen sidebar would run out of parent to stick to and
+   leave a blank gap once the page scrolls past one viewport height). */
+#admin-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  transform: translateX(-100%);
+  transition: transform 0.2s ease;
+}
+#admin-sidebar.open {
+  transform: translateX(0);
+}
+@media (min-width: 1024px) {
+  #admin-sidebar {
+    transform: none;
+  }
+}
+
+/* Dashboard enhancements */
+.kpi-card-link {
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.kpi-card-link:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+}
+.chart-toggle-btn.active,
+.map-filter-btn.active {
+  background-color: #ffffff;
+  color: var(--ls-primary-dark, #0f1e3d);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+  font-weight: 600;
+}
+
+/* Custom leaflet tweaks */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+.leaflet-popup-content {
+  margin: 10px 12px !important;
+  line-height: 1.4 !important;
+}
+
+

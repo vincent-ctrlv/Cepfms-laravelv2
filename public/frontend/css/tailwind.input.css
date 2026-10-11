@@ -1,0 +1,4 @@
+/* Source for frontend/css/tailwind.css (citizen portal). Build: npm run build:css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
