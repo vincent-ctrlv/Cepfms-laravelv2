@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\RequireCitizen;
 use App\Http\Middleware\RequireStaff;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\StaffIdleTimeout;
@@ -28,7 +29,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Passwords are compared exactly as typed.
         $middleware->trimStrings(except: ['password', 'current_password', 'new_password', 'confirm_password']);
         $middleware->alias([
-            'staff' => RequireStaff::class,
+            'staff'   => RequireStaff::class,
+            'citizen' => RequireCitizen::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -1,25 +1,9 @@
 {{-- VIEW: Citizen Submission Tracker
-     Expects (set by CitizenController): $ref, $submission, $notFound, $stageOrder,
-     $currentStage, $currentIndex, $notAccepted, $rejectReason, $rejectHint, $rejectNote, $stageTimes --}}
+     Expects (set by CitizenController): $ref, $submission, $notFound, and the progress
+     variables from SubmissionProgress::timeline() ($stageOrder, $stageDescriptions, $stageBadge,
+     $currentStage, $currentIndex, $notAccepted, $rejectReason, $rejectHint, $rejectNote, $stageTimes) --}}
 @include('partials.header')
 @include('partials.navbar')
-<?php
-$stageDescriptions = [
-  'Submitted'  => "We've received your report and it's in queue for review.",
-  'Received'   => 'Confirmed and logged into our system.',
-  'In Review'  => 'Our staff are evaluating the details.',
-  'Assigned'   => 'A staff member is working on it.',
-  'Resolved'   => 'Addressed and closed out.',
-];
-// The badge follows the public stage, not the raw DB status (e.g. old "Escalated" rows read as Assigned).
-$stageBadge = [
-  'Submitted' => 'badge-slate',
-  'Received'  => 'badge-blue',
-  'In Review' => 'badge-amber',
-  'Assigned'  => 'badge-teal',
-  'Resolved'  => 'badge-green',
-];
-?>
 
 <main id="main-content" class="tr-page">
   <div class="sf-card">
@@ -84,52 +68,9 @@ $stageBadge = [
         @endif
       </div>
 
-      @if ($notAccepted)
-        <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3.5 mb-6">
-          <p class="text-sm font-semibold text-red-800 mb-1">This submission wasn't accepted</p>
-          @if ($rejectReason)
-            <p class="text-xs text-red-700 leading-relaxed"><span class="font-semibold">Reason: {{ $rejectReason }}</span>{!! $rejectHint ? ' — ' . e($rejectHint) : '' !!}</p>
-            @if ($rejectNote)
-              <p class="text-xs text-red-700 leading-relaxed mt-1.5"><span class="font-semibold">Note from the office:</span> {{ $rejectNote }}</p>
-            @endif
-            <p class="text-xs text-red-700 leading-relaxed mt-1.5">See the <a href="{{ app_href('citizen/terms') }}" class="underline">Terms</a>. You're welcome to send a new report with more details.</p>
-          @else
-          <p class="text-xs text-red-700 leading-relaxed">After review, it couldn't be processed — for example, it was a duplicate, outside San Jose del Monte, or didn't follow the <a href="{{ app_href('citizen/terms') }}" class="underline">Terms</a>. You're welcome to send a new report with more details.</p>
-          @endif
-          <a href="{{ app_href('citizen/submit') }}" class="sf-btn-primary inline-flex items-center justify-center mt-3">Submit new feedback</a>
-        </div>
-      @else
-      <!-- Vertical progress timeline: finished steps get a check, the current step a ring and highlight. -->
-      <ol class="mb-6" aria-label="Progress">
-        <?php $lastIndex = count($stageOrder) - 1; ?>
-        @foreach ($stageOrder as $i => $stage) @php $done = $i < $currentIndex; $current = $i === $currentIndex; @endphp
-        <li class="relative flex gap-3.5 {!! $i < $lastIndex ? 'pb-4' : '' !!}" {!! $current ? 'aria-current="step"' : '' !!}>
-          @if ($i < $lastIndex)
-            <span class="absolute left-[13px] top-7 bottom-0 w-0.5" style="background: {!! $i < $currentIndex ? '#059669' : '#e2e8f0' !!};" aria-hidden="true"></span>
-          @endif
-          <span class="tracker-dot flex-shrink-0 {!! $current ? ($stage === 'Resolved' ? 'tracker-dot-current' : 'tracker-dot-current is-live') : '' !!}" style="background: {!! ($done || $current) ? '#059669' : '#e2e8f0' !!}; color: {!! ($done || $current) ? '#fff' : '#475569' !!};">
-            @if ($done || ($current && $stage === 'Resolved'))
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-            @elseif ($current)
-              <span class="w-2 h-2 rounded-full bg-white" aria-hidden="true"></span>
-            @else
-              <span class="text-[10px] font-mono">{!! $i + 1 !!}</span>
-            @endif
-          </span>
-          <div class="flex-1 min-w-0 {!! $current ? 'rounded-lg border border-emerald/30 bg-emerald/5 px-3 py-2 -mt-1' : 'pt-1' !!}">
-            <p class="text-sm {!! $current ? 'text-navy font-semibold' : ($done ? 'text-navy font-medium' : 'text-slate') !!}">
-              {{ $stage }}
-              @if ($current && $stage !== 'Resolved')<span class="ml-1.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-emerald">Current</span>@endif
-            </p>
-            <p class="text-xs {!! $current ? 'text-navy/80' : 'text-slate' !!} mt-0.5">{{ $stageDescriptions[$stage] ?? '' }}</p>
-            @if (($done || $current) && !empty($stageTimes[$stage])) @php $at = strtotime($stageTimes[$stage]); @endphp
-              <p class="tr-stage-time"><time datetime="{{ date('c', $at) }}">{{ date('M j, Y · g:i A', $at) }}</time></p>
-            @endif
-          </div>
-        </li>
-        @endforeach
-      </ol>
+      @include('citizen.partials.progress')
 
+      @if (!$notAccepted)
       @if (!empty($submission['responded_at']))
         <div class="flex gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 mb-4">
           <svg class="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>

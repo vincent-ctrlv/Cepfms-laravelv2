@@ -18,9 +18,18 @@
 
     <section>
       <h2 class="text-base font-semibold text-navy mb-2">1. Information We Collect</h2>
-      <p class="mb-2">When you submit feedback, a complaint, or a proposal through this portal, we collect:</p>
+      <p class="mb-2">To submit, you sign in with Google and verify your identity once. For this we collect:</p>
+      <ul class="list-disc pl-5 space-y-1 mb-3">
+        <li>From your Google account: your name, email address, and Google account ID. We do not receive your
+          Google password, contacts, or any other Google data.</li>
+        <li>For identity verification: your full name as printed on your ID, the type of ID, your barangay of
+          residence, a photo of the front of your ID, and a selfie of you holding it. We do <strong>not</strong>
+          store your full ID number — only its last 4 characters, plus a one-way code made from it so we can tell
+          if the same ID is used on more than one account.</li>
+      </ul>
+      <p class="mb-2">When you submit feedback, a complaint, or a proposal, we also collect:</p>
       <ul class="list-disc pl-5 space-y-1">
-        <li>Your full name, email address, and mobile number (all required).</li>
+        <li>Your mobile number (required). Your name and email come from your verified account.</li>
         <li>The subject and description of your submission, and the photos you attach (at least one is required).</li>
         <li>Location details you provide or share, such as city, barangay, street, or GPS coordinates
           (only if you place a pin on the map).</li>
@@ -34,6 +43,8 @@
     <section>
       <h2 class="text-base font-semibold text-navy mb-2">2. How We Use Your Information</h2>
       <ul class="list-disc pl-5 space-y-1">
+        <li>To confirm that each submission comes from a real resident of San Jose del Monte. Your ID photos are
+          used only for this check.</li>
         <li>To review, classify, and act on your submission.</li>
         <li>To update you on the status of your submission and respond to it.</li>
         <li>To detect and prevent spam, duplicate, or abusive submissions.</li>
@@ -56,6 +67,8 @@
         needed to act on your report, the city office responsible for it (for example, the engineering office
         for a road complaint). We do not sell, rent, or share your personal information with private third
         parties for marketing purposes.</p>
+      <p class="mt-2">Your ID photos are never shared outside the Legislative Services Office. They can be viewed
+        only by authorized administrators while checking your identity.</p>
     </section>
 
     <section>
@@ -69,7 +82,8 @@
       <h2 class="text-base font-semibold text-navy mb-2">6. Data Security</h2>
       <p>We apply reasonable organizational and technical safeguards to protect your information, including
         restricted staff access by role, encrypted password storage, and protections against
-        common web attacks. No online system can guarantee absolute security, but we take reasonable steps to
+        common web attacks. ID photos are kept in storage that is not reachable from the web and are shown only
+        to signed-in administrators. No online system can guarantee absolute security, but we take reasonable steps to
         protect your data against loss, misuse, or unauthorized access.</p>
     </section>
 
@@ -92,8 +106,8 @@
 
     <section>
       <h2 class="text-base font-semibold text-navy mb-2">8. Cookies</h2>
-      <p>This portal uses a single strictly-necessary session cookie to keep staff logged in and to protect
-        forms against forgery. We do not use advertising or third-party tracking cookies.</p>
+      <p>This portal uses a single strictly-necessary session cookie to keep you (or staff) signed in and to
+        protect forms against forgery. We do not use advertising or third-party tracking cookies.</p>
     </section>
 
     <section>

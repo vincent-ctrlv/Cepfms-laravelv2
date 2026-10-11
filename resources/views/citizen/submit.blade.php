@@ -1,14 +1,10 @@
 {{-- VIEW: Citizen Submission Form
-     Expects (set by CitizenController): $prefType, $categories, $priorities --}}
-@include('partials.header')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('partials.navbar')
+     Expects (set by CitizenController): $citizen (signed in and verified), $prefType, $categories, $priorities --}}
+@extends('layouts.citizen-portal')
 
-<main id="main-content" class="sf-page">
-  <div class="sf-card">
+@section('content')
+  <div class="cp-card cp-form-card">
     <header class="sf-head">
-      <span class="sf-eyebrow">San Jose del Monte · Citizen Portal</span>
-      <h1 class="sf-title">Submit Feedback</h1>
       <p class="sf-sub">Feedback, a complaint, or a proposal — write in English, Filipino, or Taglish. Our team will review it and follow up.</p>
       @if ($prefType)
         <?php $typeLabels = ['feedback' => 'General Feedback', 'complaint' => 'Complaint / Issue', 'proposal' => 'Proposal / Idea']; ?>
@@ -166,25 +162,22 @@
         <p id="photos-error" class="sf-error hidden" role="alert"></p>
       </fieldset>
 
-      <!-- Contact -->
+      <!-- Contact: name and email come from the verified account -->
       <fieldset class="sf-group">
         <legend class="sf-group-title">Your details</legend>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
-          <div class="sf-field sm:col-span-2">
-            <label class="sf-label" for="full_name">Full name <span class="sf-req">*</span></label>
-            <input id="full_name" name="full_name" type="text" required autocomplete="name" class="sf-input" placeholder="Juan Dela Cruz">
-            <p id="full_name-error" class="sf-error hidden" role="alert"></p>
-          </div>
-          <div class="sf-field">
-            <label class="sf-label" for="phone">Mobile number <span class="sf-req">*</span></label>
-            <input id="phone" name="phone" type="tel" required inputmode="tel" autocomplete="tel" class="sf-input" placeholder="09XX XXX XXXX">
-            <p id="phone-error" class="sf-error hidden" role="alert"></p>
-          </div>
-          <div class="sf-field">
-            <label class="sf-label" for="email">Email address <span class="sf-req">*</span></label>
-            <input id="email" name="email" type="email" required autocomplete="email" class="sf-input" placeholder="you@example.com">
-            <p id="email-error" class="sf-error hidden" role="alert"></p>
-          </div>
+        <div class="sf-account">
+          <span class="sf-account-badge" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <span class="min-w-0">
+            <span class="sf-account-name">{{ $citizen['full_name'] }}</span>
+            <span class="sf-account-email">{{ $citizen['email'] }} · Verified</span>
+          </span>
+        </div>
+        <div class="sf-field">
+          <label class="sf-label" for="phone">Mobile number <span class="sf-req">*</span></label>
+          <input id="phone" name="phone" type="tel" required inputmode="tel" autocomplete="tel" class="sf-input" placeholder="09XX XXX XXXX" value="{{ $citizen['phone'] ?? '' }}">
+          <p id="phone-error" class="sf-error hidden" role="alert"></p>
         </div>
         <p class="sf-note">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
@@ -219,11 +212,12 @@
       </button>
     </form>
   </div>
-</main>
+@endsection
 
-@include('partials.citizen-footer')
+@push('scripts')
 <!-- Open the address-lookup connection early so the first map tap fills in faster -->
 <link rel="preconnect" href="https://nominatim.openstreetmap.org" crossorigin>
 <link rel="stylesheet" href="{{ app_href('frontend/lib/leaflet/leaflet.css') }}">
 <script src="{{ app_href('frontend/lib/leaflet/leaflet.js') }}"></script>
 <script src="{{ app_href('frontend/js/citizen.js') }}?v={!! time() !!}"></script>
+@endpush

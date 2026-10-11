@@ -33,7 +33,7 @@
     <!-- Subtext -->
     <p class="c-hero-sub">
       Report an issue, share feedback, or propose an idea for San Jose del Monte.
-      No account needed — every submission gets a reference number you can track anytime.
+      Sign in with Google, verify your ID once, and every submission gets a reference number you can track anytime.
     </p>
 
     <!-- CTAs -->
@@ -107,8 +107,8 @@
       <div class="c-steps-connector" aria-hidden="true"></div>
       <?php
       $steps = [
-        ['01', 'Submit',                'Describe your feedback, complaint, or proposal in your own words.'],
-        ['02', 'Get a Reference Number','We generate a unique tracking code instantly — no account needed.'],
+        ['01', 'Sign In & Submit',      'Sign in with Google, verify your ID once, then describe your concern in your own words.'],
+        ['02', 'Get a Reference Number','We generate a unique tracking code instantly and email it to you.'],
         ['03', 'We Review & Validate',  'Our team checks each submission before staff act on it.'],
         ['04', 'Track Progress',        'Check your reference number anytime to see the current status.'],
       ];
@@ -140,8 +140,10 @@
     <div class="c-faq-list">
       <?php
       $faqs = [
-        ['Do I need to create an account to submit feedback?',
-         'No. CEPFMS is designed for low-friction reporting — just fill out the form with your contact details and submit. You\'ll get a reference number to track your submission without ever needing to register or log in.'],
+        ['Do I need an account to submit feedback?',
+         'Yes. Sign in with your Google (Gmail) account, then verify your identity once with a photo of a government ID showing your San Jose del Monte address and a selfie holding it. After an admin approves it, you can submit anytime. Tracking a submission by its reference number needs no sign-in.'],
+        ['How long does ID verification take?',
+         'An admin checks IDs during office hours. We email you as soon as it\'s done, and if the photo can\'t be accepted, the email says why so you can send a clearer one.'],
         ['Can I write in Filipino or Taglish?',
          'Yes. Write however feels natural — English, Filipino, Taglish, or a mix. Choosing a category and priority is optional too — if you\'re not sure, leave them and our system classifies your description automatically.'],
         ['Why isn\'t my submission showing up yet?',

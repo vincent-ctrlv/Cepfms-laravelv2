@@ -1,6 +1,8 @@
 @php
   // Which citizen page is open, for the active nav link.
-  $current = ['citizen' => 'index', 'citizen/submit' => 'submit', 'citizen/track' => 'track'][request()->path()] ?? '';
+  $current = ['citizen' => 'index', 'citizen/submit' => 'submit', 'citizen/track' => 'track'][request()->path()]
+    ?? (request()->is('citizen/dashboard', 'citizen/my-submissions', 'citizen/submissions/*', 'citizen/profile', 'citizen/verify') ? 'portal' : '');
+  $navCitizen = \App\Support\CitizenAuth::current();
 @endphp
 <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-navy focus:px-3 focus:py-2 focus:rounded focus:text-xs focus:font-semibold">Skip to main content</a>
 
@@ -23,14 +25,25 @@
       <li><a href="{{ app_href('citizen') }}"  class="{!! $current === 'index'  ? 'c-nav-active' : '' !!}">Home</a></li>
       <li><a href="{{ app_href('citizen/submit') }}" class="{!! $current === 'submit' ? 'c-nav-active' : '' !!}">Submit Feedback</a></li>
       <li><a href="{{ app_href('citizen/track') }}"  class="{!! $current === 'track'  ? 'c-nav-active' : '' !!}">Track Submission</a></li>
+      @if ($navCitizen)
+      <li><a href="{{ app_href('citizen/dashboard') }}" class="{!! $current === 'portal' ? 'c-nav-active' : '' !!}">My Portal</a></li>
+      @endif
     </ul>
 
-    <!-- Login + hamburger -->
+    <!-- Citizen sign-in / sign-out + hamburger -->
     <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
-      <a href="{{ app_href('auth/login') }}" class="c-btn-login" id="navbar-login-btn">
+      @if ($navCitizen)
+      <form method="POST" action="{{ app_href('citizen/logout') }}" class="c-nav-account">
+        @csrf
+        <span class="c-nav-account-name" title="{{ $navCitizen['email'] }}">{{ $navCitizen['full_name'] }}</span>
+        <button type="submit" class="c-btn-login" id="navbar-logout-btn">Sign out</button>
+      </form>
+      @else
+      <a href="{{ app_href('citizen/login') }}" class="c-btn-login" id="navbar-login-btn">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-        Login
+        Sign in
       </a>
+      @endif
       <button class="c-nav-toggle" id="c-nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="c-mobile-nav">
         <svg id="c-menu-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/>
@@ -47,7 +60,15 @@
     <a href="{{ app_href('citizen') }}"  class="{!! $current === 'index'  ? 'c-nav-active' : '' !!}">Home</a>
     <a href="{{ app_href('citizen/submit') }}" class="{!! $current === 'submit' ? 'c-nav-active' : '' !!}">Submit Feedback</a>
     <a href="{{ app_href('citizen/track') }}"  class="{!! $current === 'track'  ? 'c-nav-active' : '' !!}">Track Submission</a>
-    <a href="{{ app_href('auth/login') }}" class="c-mobile-login">Login to Portal</a>
+    @if ($navCitizen)
+    <a href="{{ app_href('citizen/dashboard') }}" class="{!! $current === 'portal' ? 'c-nav-active' : '' !!}">My Portal</a>
+    <form method="POST" action="{{ app_href('citizen/logout') }}">
+      @csrf
+      <button type="submit" class="c-mobile-login c-mobile-logout">Sign out ({{ $navCitizen['full_name'] }})</button>
+    </form>
+    @else
+    <a href="{{ app_href('citizen/login') }}" class="c-mobile-login">Sign in with Google</a>
+    @endif
   </div>
 </nav>
 

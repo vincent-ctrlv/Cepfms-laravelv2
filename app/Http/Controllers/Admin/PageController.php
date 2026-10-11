@@ -252,6 +252,14 @@ class PageController extends Controller
         return $this->page('admin.moderation', 'Moderation & Validation', 'moderation');
     }
 
+    /** Admins: approve or reject citizens' ID verifications. */
+    public function verifications()
+    {
+        return $this->page('admin.verifications', 'ID Verification', 'verifications', [
+            'rejectReasons' => \App\Http\Controllers\Api\VerificationController::REJECT_REASONS,
+        ]);
+    }
+
     public function responses()
     {
         return $this->page('admin.responses', 'Response Management', 'responses');

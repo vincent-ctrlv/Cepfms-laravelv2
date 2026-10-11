@@ -28,9 +28,16 @@ const CivicConnect = (() => {
 
   /** Idle timeout hit: go to the login page (it shows the "session expired" flash). */
   function redirectIfSessionExpired(res) {
-    if (res.headers.get('X-Session-Expired') !== '1') return false;
-    window.location.href = `${window.APP_URL}/auth/login`;
-    return true;
+    if (res.headers.get('X-Session-Expired') === '1') {
+      window.location.href = `${window.APP_URL}/auth/login`;
+      return true;
+    }
+    // Citizen portal: signed out (or never signed in) — back to "Sign in with Google".
+    if (res.headers.get('X-Citizen-Login') === '1') {
+      window.location.href = `${window.APP_URL}/citizen/login`;
+      return true;
+    }
+    return false;
   }
 
   // options.background: an automatic poll, not user activity — the server

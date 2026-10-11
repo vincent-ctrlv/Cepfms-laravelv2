@@ -45,6 +45,13 @@ $describe = function (array $ev): array {
         $fields = array_intersect_key(['full_name' => 'name', 'title' => 'position'], $meta);
         return ['Updated own profile' . ($fields ? ' (' . implode(', ', $fields) . ')' : ''), 'badge-slate'];
     }
+    if ($action === 'ID verification approved') {
+        return ['Approved ID verification for ' . ($meta['name'] ?? 'a citizen') . (isset($meta['email']) ? ' (' . $meta['email'] . ')' : ''), 'badge-green'];
+    }
+    if ($action === 'ID verification rejected') {
+        return ['Rejected ID verification for ' . ($meta['name'] ?? 'a citizen') . (isset($meta['email']) ? ' (' . $meta['email'] . ')' : '')
+            . (!empty($meta['reason']) ? ' · ' . $meta['reason'] : ''), 'badge-red'];
+    }
     if ($action === 'export_csv') return ['Exported submissions to CSV', 'badge-amber'];
     if ($action === 'Analytics exported') return ['Exported analytics to a password-protected PDF', 'badge-amber'];
     if ($action === 'Analytics printed') return ['Opened analytics as a password-protected PDF to print', 'badge-amber'];

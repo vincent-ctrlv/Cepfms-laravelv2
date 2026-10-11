@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\AIClassifier;
+use App\Support\CitizenAuth;
+use App\Support\SubmissionProgress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -22,6 +24,8 @@ class CitizenController extends Controller
         $type = $request->query('type', '');
         return view('citizen.submit', [
             'pageTitle'  => 'Submit Feedback',
+            'portalNav'  => 'submit',
+            'citizen'    => CitizenAuth::current(),
             'prefType'   => in_array($type, ['feedback', 'complaint', 'proposal'], true) ? $type : '',
             // Optional on the form; left empty, the AI decides.
             'categories' => AIClassifier::CATEGORIES,
@@ -70,61 +74,14 @@ class CitizenController extends Controller
             $notFound = !$submission;
         }
 
-        // Map DB statuses onto the public 5-stage tracker.
-        $stageOrder = ['Submitted', 'Received', 'In Review', 'Assigned', 'Resolved'];
-        $statusToStage = [
-            'Pending'   => 'Submitted',
-            'Received'  => 'Received',
-            'In Review' => 'In Review',
-            'Assigned'  => 'Assigned',
-            'Escalated' => 'Assigned',
-            'Resolved'  => 'Resolved',
+        // Stages, times and the rejection notice for the public tracker (shared with the citizen portal).
+        $progress = $submission ? SubmissionProgress::timeline($submission) : [
+            'stageOrder' => SubmissionProgress::STAGES, 'stageDescriptions' => SubmissionProgress::DESCRIPTIONS,
+            'stageBadge' => SubmissionProgress::BADGES, 'currentStage' => null, 'currentIndex' => -1,
+            'notAccepted' => false, 'rejectReason' => null, 'rejectHint' => null, 'rejectNote' => null, 'stageTimes' => [],
         ];
-        $currentStage = $submission ? ($statusToStage[$submission['status']] ?? 'Submitted') : null;
-        $currentIndex = $currentStage ? array_search($currentStage, $stageOrder, true) : -1;
-        // Rejected in moderation: it never enters the workflow, so say so
-        // instead of showing a tracker stuck on "Submitted".
-        $notAccepted = $submission && ($submission['moderation_status'] ?? '') === 'Rejected';
-        $rejectReason = $notAccepted ? ($submission['reject_reason'] ?? null) : null;
-        $rejectHint = $rejectReason ? (moderation_reject_reasons()[$rejectReason] ?? null) : null;
-        $rejectNote = $notAccepted ? ($submission['reject_note'] ?? null) : null;
 
-        // When each stage was reached, from what's already recorded: creation,
-        // the moderation approval, and staff status changes in the activity
-        // log. If a stage was entered more than once, the latest time wins.
-        $stageTimes = [];
-        if ($submission && !$notAccepted) {
-            $stageTimes['Submitted'] = $submission['created_at'];
-
-            $approvedAt = DB::scalar(
-                "SELECT MAX(reviewed_at) FROM moderation_queue WHERE submission_id = ? AND status = 'Approved'",
-                [$submission['id']]
-            );
-            if ($approvedAt) $stageTimes['Received'] = $approvedAt;
-
-            $logs = DB::select("
-                SELECT action, metadata, created_at FROM activity_log
-                WHERE entity = 'submission' AND entity_id = ?
-                  AND action IN ('Status changed', 'Complaint closed', 'Proposal implemented', 'Submission assigned', 'Complaint escalated')
-                ORDER BY created_at, id
-            ", [$submission['id']]);
-            // The last two actions only appear on older records.
-            $actionStatus = ['Complaint closed' => 'Resolved', 'Proposal implemented' => 'Resolved', 'Submission assigned' => 'Assigned', 'Complaint escalated' => 'Escalated'];
-            foreach ($logs as $log) {
-                $newStatus = $log->action === 'Status changed'
-                    ? (json_decode($log->metadata ?? '', true)['new_status'] ?? null)
-                    : $actionStatus[$log->action];
-                $stage = $statusToStage[$newStatus] ?? null;
-                if ($stage) $stageTimes[$stage] = $log->created_at;
-            }
-        }
-
-        return view('citizen.track', [
-            'pageTitle' => 'Track Submission',
-        ] + compact(
-            'ref', 'submission', 'notFound', 'stageOrder', 'statusToStage', 'currentStage', 'currentIndex',
-            'notAccepted', 'rejectReason', 'rejectHint', 'rejectNote', 'stageTimes'
-        ));
+        return view('citizen.track', ['pageTitle' => 'Track Submission'] + compact('ref', 'submission', 'notFound') + $progress);
     }
 
     public function privacy()

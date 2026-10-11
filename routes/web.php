@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\PageController as AdminPages;
 use App\Http\Controllers\Api;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CitizenAccountController;
 use App\Http\Controllers\CitizenController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,14 +21,31 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => redirect(app_href('citizen')));
 Route::get('/healthz', fn () => response()->json(['status' => 'ok', 'timestamp' => time()]));
 
-// ---- Citizen portal (public) -------------------------------------------
+// ---- Citizen portal ----------------------------------------------------
+// Browsing and tracking are public; submitting needs a Google sign-in and an
+// approved government ID.
 Route::prefix('citizen')->controller(CitizenController::class)->group(function () {
     Route::get('/', 'home')->name('citizen.home');
-    Route::get('/submit', 'submit')->name('citizen.submit');
+    Route::get('/submit', 'submit')->middleware('citizen:verified')->name('citizen.submit');
     Route::get('/success', 'success')->name('citizen.success');
     Route::get('/track', 'track')->name('citizen.track');
     Route::get('/privacy', 'privacy')->name('citizen.privacy');
     Route::get('/terms', 'terms')->name('citizen.terms');
+});
+
+// ---- Citizen accounts (Google sign-in + ID verification) ----------------
+Route::prefix('citizen')->controller(CitizenAccountController::class)->group(function () {
+    Route::get('/login', 'login')->name('citizen.login');
+    Route::get('/auth/google', 'redirectToGoogle')->name('citizen.google');
+    Route::get('/auth/google/callback', 'googleCallback')->name('citizen.google.callback');
+    Route::middleware('citizen')->group(function () {
+        Route::post('/logout', 'logout')->name('citizen.logout');
+        Route::get('/dashboard', 'dashboard')->name('citizen.dashboard');
+        Route::get('/verify', 'verify')->name('citizen.verify');
+        Route::get('/my-submissions', 'mySubmissions')->name('citizen.my-submissions');
+        Route::get('/submissions/{reference}', 'submission')->where('reference', '[A-Za-z]{2}-[0-9]{4,10}')->name('citizen.submission');
+        Route::get('/profile', 'profile')->name('citizen.profile');
+    });
 });
 
 // ---- Staff sign-in -----------------------------------------------------
@@ -50,6 +68,7 @@ Route::prefix('admin')->middleware('staff')->controller(AdminPages::class)->grou
     Route::get('/analytics', 'analytics')->name('admin.analytics');
     Route::get('/profile', 'profile')->name('admin.profile');
     Route::get('/moderation', 'moderation')->middleware('staff:admin')->name('admin.moderation');
+    Route::get('/verifications', 'verifications')->middleware('staff:admin')->name('admin.verifications');
     Route::get('/staff', 'accounts')->middleware('staff:super_admin')->name('admin.staff');
     Route::get('/audit-log', 'auditLog')->middleware('staff:super_admin')->name('admin.audit-log');
     Route::get('/settings', 'settings')->middleware('staff:super_admin')->name('admin.settings');
@@ -61,7 +80,11 @@ Route::prefix('api')->group(function () {
     Route::post('/auth/login', [Api\AuthController::class, 'login']);
     Route::post('/auth/forgot-password', [Api\AuthController::class, 'forgotPassword']);
     Route::post('/auth/reset-password', [Api\AuthController::class, 'resetPassword']);
-    Route::post('/submissions/create', [Api\SubmissionController::class, 'create']);
+
+    // Signed-in citizens
+    Route::post('/citizen/verification', [Api\VerificationController::class, 'store'])->middleware('citizen');
+    Route::post('/citizen/profile', [Api\VerificationController::class, 'updateProfile'])->middleware('citizen');
+    Route::post('/submissions/create', [Api\SubmissionController::class, 'create'])->middleware('citizen:verified');
 
     // Any signed-in staff
     Route::middleware('staff')->group(function () {
@@ -98,6 +121,8 @@ Route::prefix('api')->group(function () {
     Route::middleware('staff:admin')->group(function () {
         Route::get('/moderation/list', [Api\ModerationController::class, 'list']);
         Route::post('/moderation/action', [Api\ModerationController::class, 'action']);
+        Route::get('/verifications/list', [Api\VerificationController::class, 'list']);
+        Route::post('/verifications/action', [Api\VerificationController::class, 'action']);
     });
 
     // Super admins (accounts and system settings)
@@ -110,6 +135,10 @@ Route::prefix('api')->group(function () {
         Route::post('/settings/branding', [Api\SettingsController::class, 'branding']);
     });
 });
+
+// ID photos for the admin review page: signed-in admins only, never public.
+Route::get('/admin/verifications/{id}/{kind}', [Api\VerificationController::class, 'photo'])
+    ->middleware('staff:admin')->whereNumber('id')->whereIn('kind', ['id', 'selfie']);
 
 // Old links from the plain-PHP version (e.g. /citizen/track.php?ref=… in
 // emails already sent) keep working: drop the ".php" and redirect.

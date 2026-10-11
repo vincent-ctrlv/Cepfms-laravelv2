@@ -10,9 +10,8 @@ use Illuminate\Support\Facades\DB;
  *
  *   php artisan db:seed --class=DemoDataSeeder
  *
- * Adds three staff accounts (password for all: "Demo-Password-123"):
- *   superadmin@cepfms.test (super admin), admin@cepfms.test (admin),
- *   staff@cepfms.test (staff)
+ * Adds two accounts (password for both: "Demo-Password-123"):
+ *   superadmin@cepfms.test (super admin), admin@cepfms.test (admin)
  * plus citizens and submissions spread over the last few weeks in every
  * workflow state (awaiting moderation, approved, rejected, resolved).
  */
@@ -27,7 +26,6 @@ class DemoDataSeeder extends Seeder
         foreach ([
             ['Maria Santos', 'superadmin@cepfms.test', 'super_admin', 'Legislative Services Head'],
             ['Jose Reyes', 'admin@cepfms.test', 'admin', 'Records Officer'],
-            ['Ana Cruz', 'staff@cepfms.test', 'staff', 'Administrative Aide'],
         ] as [$name, $email, $role, $title]) {
             $staffIds[$role] = DB::table('users')->where('email', $email)->value('id') ?? DB::table('users')->insertGetId([
                 'full_name' => $name, 'email' => $email, 'password_hash' => $password,
@@ -137,7 +135,7 @@ class DemoDataSeeder extends Seeder
             if ($status === 'Resolved') {
                 DB::table('responses')->insert([
                     'submission_id' => $submissionId,
-                    'staff_id' => $staffIds['staff'],
+                    'staff_id' => $staffIds['admin'],
                     'subject' => 'Re: ' . $subject,
                     'body' => "Thank you for reaching out. Your concern has been addressed.\n\nSincerely,\nCEPFMS Team",
                     'status' => 'Sent',

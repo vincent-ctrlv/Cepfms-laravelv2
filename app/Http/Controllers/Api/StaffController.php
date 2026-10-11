@@ -19,7 +19,7 @@ class StaffController extends Controller
         $input = $this->input();
         $fullName = trim((string) ($input['full_name'] ?? ''));
         $email = mb_strtolower(trim((string) ($input['email'] ?? '')));
-        $role = (string) ($input['role'] ?? 'staff');
+        $role = (string) ($input['role'] ?? 'admin');
         $title = trim((string) ($input['title'] ?? ''));
 
         if ($fullName === '' || $email === '') {
@@ -31,8 +31,8 @@ class StaffController extends Controller
         if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 190) {
             json_fail('Please enter a valid email address.', 422);
         }
-        // New super admins are made with bin/make-super-admin.php, not from the UI.
-        if (!in_array($role, ['admin', 'staff'], true)) {
+        // Accounts made here are admins; new super admins are made from the command line.
+        if ($role !== 'admin') {
             json_fail('Invalid role.', 422);
         }
 

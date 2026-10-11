@@ -836,6 +836,33 @@ HTML;
         return self::sendViaSmtp($toEmail, $emailSubject, $body, $htmlBody);
     }
 
+    /** Tells a citizen their ID was approved (they can now submit) or rejected (and why). */
+    public static function notifyVerificationResult(string $toEmail, string $citizenName, bool $approved, ?string $rejectReason = null): bool
+    {
+        $brand = setting('brand_short_name');
+        if ($approved) {
+            $subject = "Your {$brand} account is verified";
+            $body = "Hi {$citizenName},\n\n"
+                  . "Your ID has been checked and your account is now verified. You can submit feedback, complaints, and proposals here:\n"
+                  . app_url('citizen/submit') . "\n\n"
+                  . setting('email_signoff');
+        } else {
+            $subject = "We couldn't verify your {$brand} account";
+            $body = "Hi {$citizenName},\n\n"
+                  . "We could not verify your ID" . ($rejectReason ? ": {$rejectReason}" : '.') . "\n\n"
+                  . "You can sign in and send a new photo of your ID here:\n"
+                  . app_url('citizen/verify') . "\n\n"
+                  . "If you have questions, contact us at " . setting('contact_email') . ".\n\n"
+                  . setting('email_signoff');
+        }
+
+        if (self::isDevMode()) {
+            logger()->info("[CEPFMS][DEV EMAIL] To: {$toEmail} | Subject: {$subject}");
+            return true;
+        }
+        return self::sendViaSmtp($toEmail, $subject, $body);
+    }
+
     private static function sendViaSmtp(string $to, string $subject, string $body, string $htmlBody = ''): bool
     {
         try {

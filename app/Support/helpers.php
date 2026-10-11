@@ -164,7 +164,7 @@ function is_super_admin(): bool
 /** Human label for a role value, e.g. for badges and activity log entries. */
 function role_label(?string $role): string
 {
-    return ['super_admin' => 'Super Admin', 'admin' => 'Admin', 'staff' => 'Staff'][$role] ?? 'Staff';
+    return ['super_admin' => 'Super Admin', 'admin' => 'Admin'][$role] ?? 'Admin';
 }
 
 /**

@@ -32,6 +32,27 @@ return [
         ],
     ],
 
+    // ---- Citizen identity verification -------------------------------------
+    // Government IDs accepted for verification. Each must show the holder's
+    // address, which the reviewing admin checks is in San Jose del Monte.
+    'verification' => [
+        'id_types' => [
+            'PhilSys National ID (PhilID / ePhilID)',
+            "Driver's License",
+            'UMID',
+            "Voter's ID / Voter's Certification",
+            'Postal ID',
+            'Bulacan Provincial ID',
+            'Barangay ID',
+            'Senior Citizen ID',
+            'PWD ID',
+            'Other government-issued ID with address',
+        ],
+        'photo_max_size' => 5 * 1024 * 1024, // 5MB per photo
+        'photo_min_px'   => 300,             // shortest side, so the details are readable
+        'max_per_day'    => 3,               // verification attempts per account per 24 hours
+    ],
+
     // ---- Staff sessions ---------------------------------------------------
     // Staff are signed out after this many seconds without activity.
     'staff_idle_seconds' => (int) env('STAFF_IDLE_SECONDS', 180),

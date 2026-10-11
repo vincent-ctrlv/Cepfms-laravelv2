@@ -3,7 +3,7 @@
      $twoFactorOn, $twoFactorLocked --}}
 @include('partials.admin-header')
 <?php
-$roleBadge = ['super_admin' => 'badge-blue', 'admin' => 'badge-teal', 'staff' => 'badge-slate'];
+$roleBadge = ['super_admin' => 'badge-blue', 'admin' => 'badge-teal'];
 // Same rule as the sidebar: first letter of the first and last word of the name.
 $nameParts = explode(' ', trim($staff['full_name']));
 $profileInitials = mb_strtoupper(mb_substr($nameParts[0], 0, 1) . mb_substr(end($nameParts), 0, 1));

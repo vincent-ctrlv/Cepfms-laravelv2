@@ -6,6 +6,23 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 .font-mono, .ref-number { font-family: 'Roboto Mono', monospace; font-variant-numeric: normal; }
 .kpi-value { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-variant-numeric: normal; }
 
+/* Staff sign-in pages (login, forgot/reset password): the City Hall photo
+   background. Styled here rather than with Tailwind utilities because these
+   pages use the Tailwind CDN, and until it loads (or if it is slow or
+   blocked) those utilities don't exist and the photo layer collapsed to
+   nothing. The layers sit at z-index -1 inside the page's own stacking
+   context, so the card stays on top whether or not Tailwind has loaded. */
+.auth-page { position: relative; z-index: 0; min-height: 100vh; background-color: #0f1e3d; }
+.auth-bg-photo,
+.auth-bg-overlay { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.auth-bg-photo {
+  background: url('../images/site/city-hall-hero.jpg') center / cover no-repeat;
+  filter: brightness(0.85);
+}
+.auth-bg-overlay {
+  background: linear-gradient(180deg, rgba(12,26,53,0.25) 0%, rgba(12,26,53,0.55) 55%, rgba(12,26,53,0.92) 100%);
+}
+
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 3px; }

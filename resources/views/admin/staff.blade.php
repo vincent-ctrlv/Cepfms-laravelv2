@@ -2,7 +2,7 @@
      Expects (set by Admin\PageController): $staff, $activeNav, $pageTitle, $accounts --}}
 @include('partials.admin-header')
 <?php
-$roleBadge = ['super_admin' => 'badge-blue', 'admin' => 'badge-teal', 'staff' => 'badge-slate'];
+$roleBadge = ['super_admin' => 'badge-blue', 'admin' => 'badge-teal'];
 ?>
 
 <div class="mb-6 flex flex-wrap items-start justify-between gap-3">

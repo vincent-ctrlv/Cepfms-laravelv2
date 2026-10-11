@@ -19,7 +19,7 @@
         <li><a href="{{ app_href('citizen') }}">Home</a></li>
         <li><a href="{{ app_href('citizen/submit') }}">Submit Feedback</a></li>
         <li><a href="{{ app_href('citizen/track') }}">Track a Submission</a></li>
-        <li><a href="{{ app_href('auth/login') }}">Login to Portal</a></li>
+        <li><a href="{{ app_href('auth/login') }}">Staff Login</a></li>
       </ul>
     </div>
 

@@ -3,10 +3,10 @@
 @include('partials.header')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
-<main class="min-h-screen relative flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+<main class="auth-page min-h-screen relative flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
   <!-- Background photo -->
-  <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ app_href('frontend/images/site/city-hall-hero.jpg') }}'); filter: brightness(0.85);"></div>
-  <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(12,26,53,0.25) 0%, rgba(12,26,53,0.55) 55%, rgba(12,26,53,0.92) 100%);"></div>
+  <div class="auth-bg-photo" aria-hidden="true"></div>
+  <div class="auth-bg-overlay" aria-hidden="true"></div>
 
   <!-- Card -->
   <div class="relative w-full max-w-md rounded-2xl border border-borderc bg-white/90 backdrop-blur-xl shadow-2xl p-8 sm:p-10">

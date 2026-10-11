@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Services\AIClassifier;
 use App\Services\EmailService;
 use App\Services\FileUploadService;
 use App\Services\SpamService;
+use App\Support\CitizenAuth;
 use RuntimeException;
 use function Illuminate\Support\defer;
 use Throwable;
@@ -33,10 +35,15 @@ class SubmissionController extends Controller
 
 
         // ---- Validate input (server-side; never trust client-only validation) ----
+        // Only verified citizens get here (citizen:verified middleware): the name is the
+        // one on their approved ID, and the email is their Google account's.
+        $citizen = CitizenAuth::current();
+        $citizenId = (int) $citizen['id'];
+        $fullName = $citizen['full_name'];
+        $email = $citizen['email'];
+
         $subject = clean_str($post['subject'] ?? '');
         $description = clean_str($post['description'] ?? '');
-        $fullName = preg_replace('/\s+/u', ' ', clean_str($post['full_name'] ?? ''));
-        $email = filter_var(trim($post['email'] ?? ''), FILTER_SANITIZE_EMAIL);
         $phone = clean_str($post['phone'] ?? '');
         $city = clean_str($post['city'] ?? '');
         $barangay = clean_str($post['barangay'] ?? '');
@@ -57,8 +64,6 @@ class SubmissionController extends Controller
         elseif (SpamService::unreadableReason($subject) !== null) $errors[] = "The subject doesn't look readable. Please describe the issue in a few words.";
         if (mb_strlen($description) < 10) $errors[] = 'Please provide a more detailed description.';
         elseif (SpamService::unreadableReason($description, 3) !== null) $errors[] = "The description doesn't look readable. Please describe the issue in a few real words (at least 3).";
-        if ($fullName === '') $errors[] = 'Full name is required.';
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'A valid email address is required.';
         $phone = preg_replace('/[\s\-()]/', '', $phone);
         if (!preg_match('/^(09|\+639)\d{9}$/', $phone)) $errors[] = 'A valid mobile number is required (e.g. 09171234567).';
         if (($photoError = FileUploadService::validate($photos)) !== null) $errors[] = $photoError;
@@ -113,20 +118,10 @@ class SubmissionController extends Controller
         $pdo = db();
 
         try {
-            $pdo->beginTransaction();
+            DB::beginTransaction(); // Laravel's, so it nests (savepoints) inside an outer transaction
 
-            // Find or create citizen record
-            $stmt = $pdo->prepare('SELECT id FROM citizens WHERE email = ? LIMIT 1');
-            $stmt->execute([$email]);
-            $citizenId = $stmt->fetchColumn();
-            if (!$citizenId) {
-                $ins = $pdo->prepare('INSERT INTO citizens (full_name, email, phone) VALUES (?,?,?)');
-                $ins->execute([$fullName, $email, $phone]);
-                $citizenId = (int) $pdo->lastInsertId();
-            } else {
-                // Keep the latest name and contact number on file for returning citizens.
-                $pdo->prepare('UPDATE citizens SET full_name = ?, phone = ? WHERE id = ?')->execute([$fullName, $phone, $citizenId]);
-            }
+            // Keep the latest contact number on their account.
+            $pdo->prepare('UPDATE citizens SET phone = ? WHERE id = ?')->execute([$phone, $citizenId]);
 
             $referenceNumber = generate_reference_number($submissionType);
 
@@ -182,9 +177,9 @@ class SubmissionController extends Controller
                 $insAtt->execute([$submissionId, $att['original_name'], $att['stored_name'], $att['file_path'], $att['mime_type'], $att['file_size']]);
             }
 
-            $pdo->commit();
+            DB::commit();
         } catch (Throwable $e) {
-            if ($pdo->inTransaction()) $pdo->rollBack();
+            DB::rollBack();
             FileUploadService::cleanup($storedPhotos ?? []);
             logger()->error('[CEPFMS] Submission creation failed: ' . $e->getMessage());
             json_fail('Submission could not be completed. Please try again.', 500);

@@ -4,6 +4,10 @@
 <IfModule mod_php8.c>
   php_flag engine off
 </IfModule>
+# PHP 8 registers its Apache module as mod_php.c (no version number).
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
 <FilesMatch "\.(php|phtml|php3|php4|php5|phar)$">
   Require all denied
 </FilesMatch>

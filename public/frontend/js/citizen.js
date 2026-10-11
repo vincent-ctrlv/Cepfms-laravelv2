@@ -348,8 +348,6 @@
       el.value = name;
       return true;
     },
-    full_name: (el) => el.value.trim().length > 0 || 'Please enter your full name.',
-    email: (el) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim()) || 'Please enter a valid email address.',
     phone: (el) => /^(09|\+639)\d{9}$/.test(el.value.replace(/[\s\-()]/g, '')) || 'Please enter a valid mobile number (e.g. 09171234567).',
     consent: (el) => el.checked || 'Please agree to the Privacy Policy and Terms of Service to continue.',
   };
@@ -472,7 +470,7 @@
 
   // ---- Draft autosave / restore (localStorage) ----------------------------
   const DRAFT_KEY = 'civicconnect_draft_v1';
-  const DRAFT_FIELDS = ['subject', 'description', 'category', 'priority', 'barangay', 'street', 'full_name', 'email', 'phone'];
+  const DRAFT_FIELDS = ['subject', 'description', 'category', 'priority', 'barangay', 'street', 'phone'];
   const bannerWrap = document.getElementById('draft-banner-wrap');
 
   function saveDraft() {
@@ -666,7 +664,8 @@
     if (result.success) {
       formDirty = false;
       clearDraft();
-      window.location.href = `${window.APP_URL || ''}/citizen/success?ref=${encodeURIComponent(result.data.reference_number)}`;
+      // Straight to the new submission in the citizen portal, with a "sent" confirmation.
+      window.location.href = `${window.APP_URL || ''}/citizen/submissions/${encodeURIComponent(result.data.reference_number)}?submitted=1`;
     } else {
       overlay.remove();
       btn.disabled = false;

@@ -95,7 +95,7 @@ const ACTIVITY_AUDIT_SCOPES = ['security' => 'Security', 'work' => 'Work activit
 /** SQL condition (alias `a`) matching security/audit events. */
 function activity_security_where(): string
 {
-    return "(a.entity IN ('staff', 'analytics', 'settings') OR a.action = 'export_csv')";
+    return "(a.entity IN ('staff', 'analytics', 'settings', 'citizen_verification') OR a.action = 'export_csv')";
 }
 
 /**
@@ -310,5 +310,5 @@ function activity_audit_log(string $scope = 'security', int $limit = 200, int $o
 /** Whether a log row is a security event (same rule as activity_security_where()). */
 function activity_is_security(array $row): bool
 {
-    return in_array($row['entity'], ['staff', 'analytics', 'settings'], true) || $row['action'] === 'export_csv';
+    return in_array($row['entity'], ['staff', 'analytics', 'settings', 'citizen_verification'], true) || $row['action'] === 'export_csv';
 }
