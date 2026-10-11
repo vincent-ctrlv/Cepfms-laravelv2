@@ -1,7 +1,7 @@
 # CEPFMS — Laravel
 
 **Citizen Engagement & Public Feedback Management System** for the Legislative Services Office
-of San Jose del Monte, rebuilt on **Laravel 13 + PHP 8.3 + MySQL**.
+of San Jose del Monte, rebuilt on **Laravel 12 + PHP 8.2 + MySQL**.
 
 It follows the same process and has the same UI as the original plain-PHP CEPFMS app.
 The pages, CSS, JavaScript, images and business rules carry over unchanged. Routing,
@@ -53,7 +53,7 @@ Super admins are created only from the command line.
 
 ## Requirements
 
-- PHP 8.3+ with `pdo_mysql`, `mbstring`, `fileinfo`, `gd`, `curl`
+- PHP 8.2+ (XAMPP 8.2 works) with `pdo_mysql`, `mbstring`, `fileinfo`, `gd`, `curl`
 - Composer
 - MySQL 8 or MariaDB 10.6+ (XAMPP/Laragon work fine)
 
