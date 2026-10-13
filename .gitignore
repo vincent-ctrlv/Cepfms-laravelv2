@@ -31,3 +31,16 @@ Thumbs.db
 !/public/uploads/submissions/.gitkeep
 # Logo uploaded on System Settings
 /public/uploads/branding/
+
+# Secrets and local data: never commit
+.env.*
+!.env.example
+*.sql
+*.sql.gz
+*.sqlite
+*.sqlite-journal
+*.pem
+*.key
+*.p12
+*.pfx
+/.claude/
